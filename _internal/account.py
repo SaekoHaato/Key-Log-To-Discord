@@ -24,10 +24,10 @@ class Account_App(CTk.CTkFrame):
                 data_buttons(parent,log,(155,10),set)
 
     def save(self,scroll_one,scroll_two):
-        channel_file = open('ChannelData.txt','a')
+        channel_file = open('Saves\\ChannelData.txt','a')
         channel_file.write(f'{self.channel_stringvar.get()}\n')
         channel_file.close()
-        account_file=open('AccountData.txt','a')
+        account_file=open('Saves\\AccountData.txt','a')
         account_file.write(f'{self.account_stringvar.get()}\n')
         account_file.close()
 
@@ -35,8 +35,8 @@ class Account_App(CTk.CTkFrame):
             widget.destroy()
         for widget in scroll_two.winfo_children():
             widget.destroy()
-        display_data(self,scroll_one,'ChannelData.txt',self.channel_stringvar)
-        display_data(self,scroll_two,'AccountData.txt',self.account_stringvar)
+        display_data(self,scroll_one,'Saves\\ChannelData.txt',self.channel_stringvar)
+        display_data(self,scroll_two,'Saves\\AccountData.txt',self.account_stringvar)
 
     def lock_entry(entry):
         if entry.cget('state') == 'disabled':
@@ -170,7 +170,7 @@ class Account_App(CTk.CTkFrame):
         channel_scroll = CTk.CTkScrollableFrame(channel_display,width=155,height=245,fg_color='#b1b1b1',corner_radius=5)
         channel_scroll.place(x=0,y=30)
 
-        display_data(self,channel_scroll,'ChannelData.txt',self.channel_stringvar)
+        display_data(self,channel_scroll,'Saves\\ChannelData.txt',self.channel_stringvar)
 
         account_display =CTk.CTkFrame(info_display,width=177,height=260,fg_color='transparent',bg_color='transparent')
         account_display.place(x=193,y=5)
@@ -181,7 +181,7 @@ class Account_App(CTk.CTkFrame):
         account_scroll = CTk.CTkScrollableFrame(account_display,width=155,height=245,fg_color='#b1b1b1',corner_radius=5)
         account_scroll.place(x=0,y=30)
 
-        display_data(self,account_scroll,'AccountData.txt',self.account_stringvar)
+        display_data(self,account_scroll,'Saves\\AccountData.txt',self.account_stringvar)
 
         save_button = CTk.CTkButton(
             master=input_frame,

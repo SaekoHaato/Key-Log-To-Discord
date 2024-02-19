@@ -24,13 +24,13 @@ class Webhook_App(CTk.CTkFrame):
                 data_buttons(parent,log,(300,10),set)
 
     def save(self,scroll_one):
-        webhook_file = open('WebhookData.txt','a')
+        webhook_file = open('Saves\\WebhookData.txt','a')
         webhook_file.write(f'{self.webhook_stringvar.get()}\n')
         webhook_file.close()
 
         for widget in scroll_one.winfo_children():
             widget.destroy()
-        display_data(self,scroll_one,'WebhookData.txt',self.webhook_stringvar)
+        display_data(self,scroll_one,'Saves\\WebhookData.txt',self.webhook_stringvar)
 
     def lock_entry(entry):
         if entry.cget('state') == 'disabled':
@@ -160,7 +160,7 @@ class Webhook_App(CTk.CTkFrame):
         webhook_scroll = CTk.CTkScrollableFrame(webhook_display,width=330,height=220,fg_color='#b1b1b1')
         webhook_scroll.place(x=12,y=30)
 
-        display_data(self,webhook_scroll,'WebhookData.txt',self.webhook_stringvar)
+        display_data(self,webhook_scroll,'Saves\\WebhookData.txt',self.webhook_stringvar)
 
         save_button = CTk.CTkButton(
             master=input_frame,
