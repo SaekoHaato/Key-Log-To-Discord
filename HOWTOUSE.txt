@@ -15,7 +15,7 @@ HOW TO USE:
     send a message and click the messages tab under the Name tab
     scroll in the headers page of the name tab until you authorization
     Press activate button and press caps lock to start key logging when u want to type
-Webhook Path:
+  Webhook Path:
     Import link of discord webhook
     Import name you want the webhook to have
     Press activate button and press caps lock to start key logging when u want to type
