@@ -4,6 +4,7 @@ import send
 from pynput import keyboard
 from accessdata import access_data
 from buttonlist import data_buttons
+from configparser import ConfigParser
 
 class Account_App(CTk.CTkFrame):
     global lock_entry
@@ -24,10 +25,10 @@ class Account_App(CTk.CTkFrame):
                 data_buttons(parent,log,(155,10),set)
 
     def save(self,scroll_one,scroll_two):
-        channel_file = open('Saves\\ChannelData.txt','a')
+        channel_file = open('Saves/ChannelData.txt','a')
         channel_file.write(f'{self.channel_stringvar.get()}\n')
         channel_file.close()
-        account_file=open('Saves\\AccountData.txt','a')
+        account_file=open('Saves/AccountData.txt','a')
         account_file.write(f'{self.account_stringvar.get()}\n')
         account_file.close()
 
@@ -35,8 +36,8 @@ class Account_App(CTk.CTkFrame):
             widget.destroy()
         for widget in scroll_two.winfo_children():
             widget.destroy()
-        display_data(self,scroll_one,'Saves\\ChannelData.txt',self.channel_stringvar)
-        display_data(self,scroll_two,'Saves\\AccountData.txt',self.account_stringvar)
+        display_data(self,scroll_one,'Saves/ChannelData.txt',self.channel_stringvar)
+        display_data(self,scroll_two,'Saves/AccountData.txt',self.account_stringvar)
 
     def lock_entry(entry):
         if entry.cget('state') == 'disabled':
@@ -53,29 +54,51 @@ class Account_App(CTk.CTkFrame):
         self.message = ""
         self.sending = False
 
+        self.settings_file = ConfigParser()
+        self.settings_file.read('Saves/settings.ini')
+
         global key_pressed
         global activate_logging
+
+        self.stop_key = str(self.settings_file['activation']['stop'])
+        self.start_key = str(self.settings_file['activation']['start'])
 
         def key_pressed(key):
             try:
                 if self.logging:
-                    if key == keyboard.Key.caps_lock:
-                        if self.sending:
-                            self.sending = False
-                            send.send_to_discord(1,(self.account_stringvar.get(),self.channel_stringvar.get(),self.message))
-                            self.message = ""
-                            
-                        else:
+                    try:
+                        if key ==  keyboard.Key[self.stop_key] and self.sending:
+                                self.sending = False
+                                send.send_to_discord(1,(self.account_stringvar.get(),self.channel_stringvar.get(),self.message))
+                                self.message = ""
+                                
+                        elif key == keyboard.Key[self.start_key]:
                             self.sending = True
-                    else:
-                        if self.sending:
-                            self.message += key.char
+                        else:
+                            if self.sending:
+                                self.message += key.char
+                    except Exception as e:
+                        print(e,1)
+                        if key.char ==  str(self.stop_key) and self.sending:
+                                self.sending = False
+                                send.send_to_discord(1,(self.account_stringvar.get(),self.channel_stringvar.get(),self.message))
+                                self.message = ""
+                                
+                        elif key.char == str(self.start_key):
+                            self.sending = True
+                        else:
+                            if self.sending:
+                                self.message += key.char
             except Exception as e:
-                print(e)
+                print(e,2)
                 if key == keyboard.Key.space and self.sending:
                     self.message += " "
                     
         def activate_logging(button):
+            self.settings_file.read('Saves/settings.ini')
+            self.stop_key = str(self.settings_file['activation']['stop'])
+            self.start_key = str(self.settings_file['activation']['start'])
+
             if button.cget('text') == 'Activate':
                 button.configure(text = 'Activated')
                 self.logging = True
@@ -170,7 +193,7 @@ class Account_App(CTk.CTkFrame):
         channel_scroll = CTk.CTkScrollableFrame(channel_display,width=155,height=245,fg_color='#b1b1b1',corner_radius=5)
         channel_scroll.place(x=0,y=30)
 
-        display_data(self,channel_scroll,'Saves\\ChannelData.txt',self.channel_stringvar)
+        display_data(self,channel_scroll,'Saves/ChannelData.txt',self.channel_stringvar)
 
         account_display =CTk.CTkFrame(info_display,width=177,height=260,fg_color='transparent',bg_color='transparent')
         account_display.place(x=193,y=5)
@@ -181,7 +204,7 @@ class Account_App(CTk.CTkFrame):
         account_scroll = CTk.CTkScrollableFrame(account_display,width=155,height=245,fg_color='#b1b1b1',corner_radius=5)
         account_scroll.place(x=0,y=30)
 
-        display_data(self,account_scroll,'Saves\\AccountData.txt',self.account_stringvar)
+        display_data(self,account_scroll,'Saves/AccountData.txt',self.account_stringvar)
 
         save_button = CTk.CTkButton(
             master=input_frame,

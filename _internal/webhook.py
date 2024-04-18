@@ -4,6 +4,7 @@ import send
 from pynput import keyboard
 from accessdata import access_data
 from buttonlist import data_buttons
+from configparser import ConfigParser
 
 class Webhook_App(CTk.CTkFrame):
     global lock_entry
@@ -24,13 +25,13 @@ class Webhook_App(CTk.CTkFrame):
                 data_buttons(parent,log,(300,10),set)
 
     def save(self,scroll_one):
-        webhook_file = open('Saves\\WebhookData.txt','a')
+        webhook_file = open('Saves/WebhookData.txt','a')
         webhook_file.write(f'{self.webhook_stringvar.get()}\n')
         webhook_file.close()
 
         for widget in scroll_one.winfo_children():
             widget.destroy()
-        display_data(self,scroll_one,'Saves\\WebhookData.txt',self.webhook_stringvar)
+        display_data(self,scroll_one,'Saves/WebhookData.txt',self.webhook_stringvar)
 
     def lock_entry(entry):
         if entry.cget('state') == 'disabled':
@@ -47,32 +48,53 @@ class Webhook_App(CTk.CTkFrame):
         self.message = ""
         self.sending = False
 
+        self.settings_file = ConfigParser()
+        self.settings_file.read('Saves/settings.ini')
+
         global key_pressed
         global activate_logging
+
+        self.stop_key = str(self.settings_file['activation']['stop'])
+        self.start_key = str(self.settings_file['activation']['start'])
 
         def key_pressed(key):
             try:
                 if self.logging:
-                    if key == keyboard.Key.caps_lock:
-                        if self.sending:
+                    try:
+                        if key == keyboard.Key[self.stop_key] and self.sending:
                             self.sending = False
                             send.send_to_discord(2,(self.username_stringvar.get(),self.webhook_stringvar.get(),self.message))
-                            self.message = ""
-                        else:
+                            self.message = ""          
+                        elif key == keyboard.Key[self.start_key]:
                             self.sending = True
-                    else:
-                        if self.sending:
-                            self.message += key.char
+                        else:
+                            if self.sending:
+                                self.message += key.char
+                    except Exception as e:
+                        print(e,1)
+                        if key.char == str(self.stop_key) and self.sending:
+                            self.sending = False
+                            send.send_to_discord(2,(self.username_stringvar.get(),self.webhook_stringvar.get(),self.message))
+                            self.message = ""          
+                        elif key.char == str(self.start_key):
+                            self.sending = True
+                        else:
+                            if self.sending:
+                                self.message += key.char
             except Exception as e:
-                print(e)
+                print(e,2)
                 if key == keyboard.Key.space and self.sending:
                     self.message += " "
                     
         def activate_logging(button):
+            self.settings_file.read('Saves/settings.ini')
+            self.stop_key = str(self.settings_file['activation']['stop'])
+            self.start_key = str(self.settings_file['activation']['start'])
+
             if button.cget('text') == 'Activate':
                 button.configure(text = 'Activated')
                 self.logging = True
-                if self.first: 
+                if self.first:
                         self.first = False
                         listener = keyboard.Listener(on_press=key_pressed)
                         listener.start()
@@ -160,7 +182,7 @@ class Webhook_App(CTk.CTkFrame):
         webhook_scroll = CTk.CTkScrollableFrame(webhook_display,width=330,height=220,fg_color='#b1b1b1')
         webhook_scroll.place(x=12,y=30)
 
-        display_data(self,webhook_scroll,'Saves\\WebhookData.txt',self.webhook_stringvar)
+        display_data(self,webhook_scroll,'Saves/WebhookData.txt',self.webhook_stringvar)
 
         save_button = CTk.CTkButton(
             master=input_frame,
