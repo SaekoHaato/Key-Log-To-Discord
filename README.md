@@ -6,7 +6,9 @@ Account Path:
 
 Import the link of the channel you want to send to Go to Discord on web browser  
 Turn on developer mode, go to Channel, and press "ctrl + shift + I"  
-Go to the network tab at the top of the developer interface, send a message, and click the messages tab under the Name tab, Copy the request URL  
+Go to the network tab at the top of the developer interface, send a message, and click the messages tab under the Name tab  
+Copy the request URL and paste it into the Channel Textbox    
+Scroll down to Authorization  
 Import the authorization  
 Press the activate button and press the Caps Lock to start key logging when u want to type 
 
