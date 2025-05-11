@@ -20,7 +20,7 @@ class Settings_App(CTk.CTk):
 
         for section in sections:
             section_holder = CTk.CTkFrame(parent,fg_color='transparent',height=100,width=140)
-            section_holder.place(x=60,y=0)
+            section_holder.pack(side='top',padx=60)
 
             section_label = CTk.CTkLabel(section_holder,fg_color='grey',text=str(section).upper(),font=('CTkFont',11),text_color='white')
             section_label.pack(side='top',pady=3)
