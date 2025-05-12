@@ -17,19 +17,23 @@ class hotkey_buttons(CTk.CTkButton):
 
                 if str(key).find('Key') != -1:
                     new_key = str(key)[4:]
-                    print(new_key)
                 elif str(key).find("'") != -1:
                     new_key = str(key)[1:-1]
 
                 label.configure(text=new_key)
                 settings_file = ConfigParser()
                 settings_file.read('Saves/settings.ini')
-                settings_file.set(str(section),str(element),str(new_key))
+
+                if section  != 'quick send':
+                    settings_file.set(str(section),str(element),str(new_key))
+                    stringvar.set(str(settings_file[section][element]))
+                else:
+                    settings_file.set(str(section),str(element.get()),str(new_key))
+                    stringvar.set(str(settings_file[section][element.get()]))
                 
                 with open('Saves/settings.ini', 'w') as configfile:
                     settings_file.write(configfile)
                 
-                stringvar.set(str(settings_file[section][element]))
             except Exception as e:
                 print(e)
 
@@ -46,13 +50,24 @@ class hotkey_buttons(CTk.CTkButton):
         change_frame=CTk.CTkFrame(change_window,width=300,height=200,fg_color='transparent')
         change_frame.place(x=0,y=0)
 
-        change_button = CTk.CTkButton(change_frame,text='Click to Start Listening',width=280,height=180,fg_color='light grey',hover_color='grey',text_color='red',command=lambda:key_change(change_button,section,element,stringvar))
+        change_button = CTk.CTkButton(change_frame,
+            text='Click to Start Listening',
+            width=280,height=180,
+            fg_color='light grey',
+            hover_color='grey',
+            text_color='red',
+            command=lambda:key_change(change_button,section,element,stringvar))
         change_button.pack(expand=True,pady=10,padx=10)
 
         change_window.mainloop()
 
     def __init__(self,parent,section,element,hotkey_stringvar):
-        super().__init__(parent,fg_color='transparent',text_color='red',width=90,command=lambda:change(section,element,hotkey_stringvar))
+        super().__init__(
+            parent,
+            fg_color='transparent',
+            text_color='red',
+            width=90,
+            command=lambda:change(section,element,hotkey_stringvar))
         
         settings_file = ConfigParser()
         settings_file.read('Saves/settings.ini')

@@ -6,10 +6,12 @@ from configparser import ConfigParser
 if __name__ == '__main__':
     from accessdata import access_data
     from buttonlist import data_buttons
+    from quickbuttons import Quick_Send_Buttons
 else:
     from Modules import send
     from Modules.accessdata import access_data
     from Modules.buttonlist import data_buttons
+    from Modules.quickbuttons import Quick_Send_Buttons
 
 class Webhook_App(CTk.CTkFrame):
     global lock_entry
@@ -61,27 +63,33 @@ class Webhook_App(CTk.CTkFrame):
         self.stop_key = str(self.settings_file['activation']['stop'])
         self.start_key = str(self.settings_file['activation']['start'])
 
+        def send_func():
+            self.sending = False
+            send.send_to_discord(2,(self.username_stringvar.get(),self.webhook_stringvar.get(),self.message))
+            self.message = ""       
+
         def key_pressed(key):
             try:
                 if self.logging:
+                    hotkeys=Quick_Send_Buttons.get_hotkeys()
                     try:
                         if key == keyboard.Key[self.stop_key] and self.sending:
-                            self.sending = False
-                            send.send_to_discord(2,(self.username_stringvar.get(),self.webhook_stringvar.get(),self.message))
-                            self.message = ""          
+                            send_func()
                         elif key == keyboard.Key[self.start_key]:
                             self.sending = True
+                        elif key.char in list(hotkeys.keys()) and  not self.sending:
+                            send.send_to_discord(2,(self.username_stringvar.get(),self.webhook_stringvar.get(),hotkeys[str(key)]))
                         else:
                             if self.sending:
                                 self.message += key.char
                     except Exception as e:
                         print(e,1)
                         if key.char == str(self.stop_key) and self.sending:
-                            self.sending = False
-                            send.send_to_discord(2,(self.username_stringvar.get(),self.webhook_stringvar.get(),self.message))
-                            self.message = ""          
+                            send_func()  
                         elif key.char == str(self.start_key):
                             self.sending = True
+                        elif key.char in list(hotkeys.keys()) and not self.sending:
+                            send.send_to_discord(2,(self.username_stringvar.get(),self.webhook_stringvar.get(),hotkeys[str(key.char)]))
                         else:
                             if self.sending:
                                 self.message += key.char
