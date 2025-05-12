@@ -17,3 +17,8 @@ Webhook Path:
 Import the link of the Discord Webhook  
 Import the name you want the webhook to have  
 Press the activate button and press Caps Lock to start key logging when u want to type 
+
+Creating Quick Send:  
+
+Go Into Settings.Ini  
+Under [quick send], add the message you want to send and set it equal to a key (ig: help me = d)
