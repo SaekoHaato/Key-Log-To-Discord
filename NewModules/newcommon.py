@@ -1,5 +1,5 @@
 import customtkinter as CTk
-
+from configparser import ConfigParser
 
 def create_input(self, name,label_cords,entry_cords, lock_cords):
     x,y = label_cords
@@ -53,19 +53,18 @@ def scroll_display(master, size, places, text):
 
 class ReplacerButton(CTk.CTkButton):
 
-    def __init__(self, master, var, text):
+    def __init__(self, master, var, save):
         super().__init__(
             master=master,
-            text=text,
-            command=lambda: var.set(text)
+            text=save[0],
+            command=lambda: var.set(save[1])
         )
         self.pack(pady=2.5)
 
 
-def set_replacerbuttons(master, file_name, var):
-    with open(file_name,'r') as file:
-        saves = file.read().split('\n')
+def set_replacerbuttons(master, section, var):
+    file = ConfigParser()
+    file.read('Saves/saves.ini')
 
-        for save in saves:
-            if save == '': continue
-            ReplacerButton(master,var,save)
+    for key, value in file[section].items():
+        ReplacerButton(master,var,(key, value))

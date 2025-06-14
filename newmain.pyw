@@ -2,6 +2,7 @@ import customtkinter as CTk
 from NewModules.newaccount import AccountApp
 from NewModules.newwebhook import WebhookApp
 from NewModules.newsettings import SettingsApp
+from NewModules.newsave import SaveApp
 from configparser import ConfigParser
 from pynput import keyboard
 import requests
@@ -9,6 +10,12 @@ from discord import SyncWebhook
 
 
 class MainApp(CTk.CTk):
+
+    def reset_saves(self):
+        if self.account_app:
+            self.account_app.set_saves()
+        else:
+            self.webhook_app.set_saves()
     
     def key_pressed(self,key):
         if not self.activated: return
@@ -70,23 +77,6 @@ class MainApp(CTk.CTk):
         
         self.message = ''
 
-    def save(self):
-        if self.account_app:
-            with open('Saves/ChannelData.txt', 'a') as file:
-                file.write(f'{self.account_app.vars['Channel'].get()}\n')
-
-            with open('Saves/AccountData.txt', 'a') as file:
-                file.write(f'{self.account_app.vars['Account'].get()}\n')
-        else:
-            with open('Saves/WebhookData.txt','a') as file:
-                pass
-                file.write(f'{self.webhook_app.vars['Webhook'].get()}\n')
-        
-        if self.account_app:
-            self.account_app.set_saves()
-        else:
-            self.webhook_app.set_saves()
-
     def __init__(self):
         super().__init__()
 
@@ -128,7 +118,11 @@ class MainApp(CTk.CTk):
         save_button = CTk.CTkButton(
             master=self.input_frame,
             text='Save',
-            command=self.save
+            command=lambda: SaveApp(
+                True if self.account_app else False, 
+                (self.account_app.vars['Channel'].get(), self.account_app.vars['Account'].get()) if self.account_app else (self.webhook_app.vars['Webhook'].get()),
+                self
+            )
         )
         save_button.place(x=97, y=120)
 

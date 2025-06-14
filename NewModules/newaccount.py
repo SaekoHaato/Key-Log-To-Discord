@@ -13,8 +13,8 @@ class AccountApp():
         for child in self.account_scroll.winfo_children() + self.channel_scroll.winfo_children():
             child.destroy()
 
-        set_replacerbuttons(self.account_scroll, 'Saves/AccountData.txt', self.vars['Account'])
-        set_replacerbuttons(self.channel_scroll, 'Saves/ChannelData.txt', self.vars['Channel'])
+        set_replacerbuttons(self.account_scroll, 'accounts', self.vars['Account'])
+        set_replacerbuttons(self.channel_scroll, 'channels', self.vars['Channel'])
 
     def __init__(self, master):
         self.vars = {}
