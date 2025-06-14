@@ -13,7 +13,7 @@ class WebhookApp():
         for child in  self.webhook_scroll.winfo_children():
             child.destroy()
 
-        set_replacerbuttons(self.webhook_scroll, 'Saves/WebhookData.txt', self.vars['Webhook'])
+        set_replacerbuttons(self.webhook_scroll, 'webhooks', self.vars['Webhook'])
 
     def __init__(self, master):
         self.vars = {}
