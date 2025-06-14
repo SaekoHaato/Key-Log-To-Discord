@@ -178,7 +178,7 @@ class SettingsApp(CTk.CTk):
             hotkey_section_label.pack(side='top',pady=3)
             key_section_label.pack(side='top',pady=3)
 
-            for element, value in dict(settings_file[section]).items():
+            for element, value in settings_file[section].items():
                 element_textvar = CTk.StringVar(hotkey_section,value=element)
                 button_textvar = CTk.StringVar(key_section,value=value)
                 if section == 'quick send':
