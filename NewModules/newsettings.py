@@ -181,21 +181,22 @@ class SettingsApp(CTk.CTk):
             for element, value in settings_file[section].items():
                 element_textvar = CTk.StringVar(hotkey_section,value=element)
                 button_textvar = CTk.StringVar(key_section,value=value)
-                if section == 'quick send':
-                    element_button = EntryButton(
-                        hotkey_section,
-                        (section, element, button_textvar),
-                        element_textvar
-                    )
-                    element_button.pack()
-                else:
-                    element_label = CTk.CTkLabel(
-                        hotkey_section,
-                        fg_color='transparent',
-                        text_color='red',
-                        text=element
-                    )
-                    element_label.pack()
+                match section:
+                    case'quick send':
+                        element_button = EntryButton(
+                            hotkey_section,
+                            (section, element, button_textvar),
+                            element_textvar
+                        )
+                        element_button.pack()
+                    case _:
+                        element_label = CTk.CTkLabel(
+                            hotkey_section,
+                            fg_color='transparent',
+                            text_color='red',
+                            text=element
+                        )
+                        element_label.pack()
 
                 value_button = ListenerButton(
                     key_section,
