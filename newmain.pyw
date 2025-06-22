@@ -1,10 +1,17 @@
 import customtkinter as CTk
+
 from NewModules.newaccount import AccountApp
 from NewModules.newwebhook import WebhookApp
 from NewModules.newsettings import SettingsApp
 from NewModules.newsave import SaveApp
+
 from configparser import ConfigParser
 from pynput import keyboard
+
+import time
+from pygame import mixer
+import pyttsx3
+
 import requests
 from discord import SyncWebhook
 
@@ -182,5 +189,16 @@ class MainApp(CTk.CTk):
 
 if __name__ == '__main__':
     App = MainApp()
+
+    tts = pyttsx3.init()
+    tts.save_to_file('Hello World', 'Saves/tts.mp3')
+    tts.runAndWait()
+
+    mixer.init(devicename='CABLE Input (VB-Audio Virtual Cable)')
+    mixer.music.load('Saves/tts.mp3')
+    mixer.music.play()
+
+    while mixer.music.get_busy():
+        time.sleep(1)
 
     App.mainloop()
