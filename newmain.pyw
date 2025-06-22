@@ -1,10 +1,19 @@
 import customtkinter as CTk
+
 from NewModules.newaccount import AccountApp
 from NewModules.newwebhook import WebhookApp
 from NewModules.newsettings import SettingsApp
 from NewModules.newsave import SaveApp
+
 from configparser import ConfigParser
 from pynput import keyboard
+
+from time import sleep
+from pygame import mixer, error as pygameerror
+from gtts import gTTS
+from os import remove
+from mutagen.mp3 import MP3
+
 import requests
 from discord import SyncWebhook
 
@@ -34,8 +43,7 @@ class MainApp(CTk.CTk):
                 self.logging = True
             elif key.char in hotkeys.keys():
                 self.send(hotkeys[key.char])
-        except Exception as e:
-            print(e)
+        except AttributeError as e:
             if self.logging:
                 if key == keyboard.Key[self.stop_key]:
                     self.send(self.message)
@@ -47,6 +55,8 @@ class MainApp(CTk.CTk):
                 self.send(hotkeys[key])
             elif key == keyboard.Key[self.start_key]:
                 self.logging = True
+        except Exception as e:
+            print(type(e),e)
         
     def activate(self):
         self.settings_file.read('Saves/settings.ini')
@@ -65,17 +75,39 @@ class MainApp(CTk.CTk):
         self.logging = False
 
         try:
-            if self.account_app:
-                payload = {'content': message}
-                header = {'authorization': self.account_app.vars['Account'].get()}
-                r = requests.post(self.account_app.vars['Channel'].get(), json=payload, headers=header)             
-            else:   
-                webhook = SyncWebhook.from_url(self.webhook_app.vars['Webhook'].get())
-                webhook.send(message, username=self.webhook_app.vars['Username'].get())
+            if self.settings_file['settings']['tts'] == 'true':
+                print(message)
+                tts = gTTS(message)
+                tts.save('Saves/tts.mp3')
+
+                mixer.music.load('Saves/tts.mp3')
+                mixer.music.play()
+
+                sleep(MP3('Saves/tts.mp3').info.length)
+
+                mixer.music.unload()
+                remove('Saves/tts.mp3')
+            else:
+                if self.account_app:
+                    payload = {'content': message}
+                    header = {'authorization': self.account_app.vars['Account'].get()}
+                    r = requests.post(self.account_app.vars['Channel'].get(), json=payload, headers=header)             
+                else:   
+                    webhook = SyncWebhook.from_url(self.webhook_app.vars['Webhook'].get())
+                    webhook.send(message, username=self.webhook_app.vars['Username'].get())
+        except pygameerror as e:
+            print(e)
+        except PermissionError as e:
+            print('Audio File being Used')
+        except FileNotFoundError as e:
+            print("Audio File Doesn't Exist")  
+        except AssertionError as e:
+            print('No message to TTS')  
         except Exception as e:
-            print(e)        
+            print(type(e),e)    
         
         self.message = ''
+        self.logging = False
 
     def __init__(self):
         super().__init__()
@@ -89,6 +121,8 @@ class MainApp(CTk.CTk):
         self.message = ''
         self.listener = keyboard.Listener(on_press=self.key_pressed)
         self.listener.start()
+
+        mixer.init(devicename='CABLE Input (VB-Audio Virtual Cable)')
 
         self.settings_file = ConfigParser()
         self.settings_file.read('Saves/settings.ini')

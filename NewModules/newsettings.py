@@ -121,6 +121,31 @@ class EntryButton(CTk.CTkButton):
         )
 
 
+class BoolButton(CTk.CTkButton):
+
+    def __init__(self, master, textvar, setting):
+        super().__init__(
+            master=master,
+            textvariable=textvar,
+            fg_color='transparent',
+            text_color='red',
+            command=self.on_click
+        )
+        self.setting=setting
+
+    def on_click(self) -> None:
+        value: str = 'True' if self._textvariable.get() == 'False' else 'False'
+        self._textvariable.set(value)
+
+        file: ConfigParser = ConfigParser()
+        file.read('Saves/settings.ini')
+
+        file['settings'][self.setting] = value.lower()
+
+        with open('Saves/settings.ini', 'w') as content:
+            file.write(content)
+
+
 class SettingsApp(CTk.CTk):
 
     def __init__(self):
@@ -181,27 +206,42 @@ class SettingsApp(CTk.CTk):
             for element, value in settings_file[section].items():
                 element_textvar = CTk.StringVar(hotkey_section,value=element)
                 button_textvar = CTk.StringVar(key_section,value=value)
-                if section == 'quick send':
-                    element_button = EntryButton(
-                        hotkey_section,
-                        (section, element, button_textvar),
-                        element_textvar
-                    )
-                    element_button.pack()
-                else:
-                    element_label = CTk.CTkLabel(
-                        hotkey_section,
-                        fg_color='transparent',
-                        text_color='red',
-                        text=element
-                    )
-                    element_label.pack()
 
-                value_button = ListenerButton(
-                    key_section,
-                    (section, element_textvar),
-                    button_textvar
-                )
+                # Hotkey Section
+                match section:
+                    case'quick send':
+                        element_button = EntryButton(
+                            hotkey_section,
+                            (section, element, button_textvar),
+                            element_textvar
+                        )
+                        element_button.pack()
+                    case _:
+                        element_label = CTk.CTkLabel(
+                            hotkey_section,
+                            fg_color='transparent',
+                            text_color='red',
+                            text=element
+                        )
+                        element_label.pack()
+                
+                # Key Section
+                value_button: ListenerButton | BoolButton
+
+                match section:
+                    case 'settings':
+                        button_textvar.set(button_textvar.get().capitalize())
+                        value_button = BoolButton(
+                            key_section,
+                            button_textvar,
+                            element
+                        )
+                    case _:
+                        value_button = ListenerButton(
+                            key_section,
+                            (section, element_textvar),
+                            button_textvar
+                        )
                 value_button.pack()
 
         self.mainloop()
