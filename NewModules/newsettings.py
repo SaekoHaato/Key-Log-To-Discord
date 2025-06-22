@@ -134,7 +134,7 @@ class BoolButton(CTk.CTkButton):
         self.setting=setting
 
     def on_click(self) -> None:
-        value: str = 'True' if self._text == 'False' else False
+        value: str = 'True' if self._textvariable.get() == 'False' else 'False'
         self._textvariable.set(value)
 
         file: ConfigParser = ConfigParser()
@@ -226,11 +226,16 @@ class SettingsApp(CTk.CTk):
                         element_label.pack()
                 
                 # Key Section
-                value_button: any
+                value_button: ListenerButton | BoolButton
 
                 match section:
                     case 'settings':
-                        pass
+                        button_textvar.set(button_textvar.get().capitalize())
+                        value_button = BoolButton(
+                            key_section,
+                            button_textvar,
+                            element
+                        )
                     case _:
                         value_button = ListenerButton(
                             key_section,
