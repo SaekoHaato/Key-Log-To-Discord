@@ -121,6 +121,31 @@ class EntryButton(CTk.CTkButton):
         )
 
 
+class BoolButton(CTk.CTkButton):
+
+    def __init__(self, master, textvar, setting):
+        super().__init__(
+            master=master,
+            textvariable=textvar,
+            fg_color='transparent',
+            text_color='red',
+            command=self.on_click
+        )
+        self.setting=setting
+
+    def on_click(self) -> None:
+        value: str = 'True' if self._text == 'False' else False
+        self._textvariable.set(value)
+
+        file: ConfigParser = ConfigParser()
+        file.read('Saves/settings.ini')
+
+        file['settings'][self.setting] = value.lower()
+
+        with open('Saves/settings.ini', 'w') as content:
+            file.write(content)
+
+
 class SettingsApp(CTk.CTk):
 
     def __init__(self):
@@ -181,6 +206,8 @@ class SettingsApp(CTk.CTk):
             for element, value in settings_file[section].items():
                 element_textvar = CTk.StringVar(hotkey_section,value=element)
                 button_textvar = CTk.StringVar(key_section,value=value)
+
+                # Hotkey Section
                 match section:
                     case'quick send':
                         element_button = EntryButton(
@@ -197,12 +224,19 @@ class SettingsApp(CTk.CTk):
                             text=element
                         )
                         element_label.pack()
+                
+                # Key Section
+                value_button: any
 
-                value_button = ListenerButton(
-                    key_section,
-                    (section, element_textvar),
-                    button_textvar
-                )
+                match section:
+                    case 'settings':
+                        pass
+                    case _:
+                        value_button = ListenerButton(
+                            key_section,
+                            (section, element_textvar),
+                            button_textvar
+                        )
                 value_button.pack()
 
         self.mainloop()
