@@ -9,6 +9,7 @@ class AccountApp():
         Args:
             entry (CTk.CTkEntry): Which Entry to lock
         """
+        
         if entry.cget("state") == "disabled":
             entry.configure(state="normal")
         else:
