@@ -77,12 +77,16 @@ class MainApp(CTk.CTk):
         self.webhook_app: WebhookApp = None#WebhookApp(masters)
 
     def reset_saves(self) -> None:
+        """
+        Regenerates the saves
+        """
         if self.account_app:
             self.account_app.set_saves()
         else:
             self.webhook_app.set_saves()
     
     def key_pressed(self,key) -> None:
+
         if not self.activated: return
 
         settings_file = ConfigParser()
