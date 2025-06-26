@@ -1,10 +1,20 @@
 # Key Log To Discord
 
-# WARNING USING THE ACCOUNT VERSION IS AGAINST DISCORD TOS; USE AT YOUR OWN RISK
+## WARNING USING THE ACCOUNT VERSION IS AGAINST DISCORD TOS; USE AT YOUR OWN RISK
 
 ## Description
 
 This program will log your keys when you click the caps lock button. Once you press the caps lock key for the second time, it will send it to Discord. This program will not steal any data. This was made with CustomTkinter for the UI
+
+## Installation
+
+### Exe
+
+Download the exe-main if you don't have python installed. Nothing else is needed  If you don't use the TTS option. If you do want TTS, you need to install **VB-CABLE Virtual Audio Device** at https://vb-audio.com/Cable/ (Check TTS section)
+
+### Python
+
+Download the python-main. Copy the directory for the requirements.txt and run this command in command terminal: `pip install -r <path-to-requirements.txt>` if you don't use the TTS option. If you do want TTS, you need to install **VB-CABLE Virtual Audio Device** at https://vb-audio.com/Cable/ (Check TTS section)
 
 ## HOW TO USE:
 
