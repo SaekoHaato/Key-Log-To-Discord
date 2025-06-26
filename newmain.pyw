@@ -75,14 +75,14 @@ class MainApp(CTk.CTk):
 
         self.masters={'input frame':self.input_frame, 'info display':self.info_display}
         self.account_app: AccountApp = AccountApp(self.masters)
-        self.webhook_app: WebhookApp = None#WebhookApp(masters)
+        self.webhook_app: WebhookApp | None = None#WebhookApp(masters)
 
     def reset_saves(self) -> None:
         """Regenerates the saves
         """
         if self.account_app:
             self.account_app.set_saves()
-        else:
+        elif self.webhook_app:
             self.webhook_app.set_saves()
     
     def key_pressed(self,key) -> None:
