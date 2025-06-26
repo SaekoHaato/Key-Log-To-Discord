@@ -151,14 +151,14 @@ class MainApp(CTk.CTk):
 
                 mixer.music.unload()
                 remove('Saves/tts.mp3')
-            else:
-                if self.account_app:
-                    payload = {'content': message}
-                    header = {'authorization': self.account_app.vars['Account'].get()}
-                    r = requests.post(self.account_app.vars['Channel'].get(), json=payload, headers=header)             
-                elif self.webhook_app:   
-                    webhook = SyncWebhook.from_url(self.webhook_app.vars['Webhook'].get())
-                    webhook.send(message, username=self.webhook_app.vars['Username'].get())
+            
+            if self.account_app:
+                payload = {'content': message}
+                header = {'authorization': self.account_app.vars['Account'].get()}
+                r = requests.post(self.account_app.vars['Channel'].get(), json=payload, headers=header)             
+            elif self.webhook_app:   
+                webhook = SyncWebhook.from_url(self.webhook_app.vars['Webhook'].get())
+                webhook.send(message, username=self.webhook_app.vars['Username'].get())
         except pygameerror as e:
             print(f'Pygame Mic: {e}')
         except PermissionError as e:
