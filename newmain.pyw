@@ -20,13 +20,69 @@ from discord import SyncWebhook
 
 class MainApp(CTk.CTk):
 
-    def reset_saves(self):
+    def __init__(self) -> None:
+        super().__init__()
+
+        self.geometry('750x300')
+        self.resizable(False,False)
+        self.title('Key Log To Discord')
+
+        self.activated: bool = False
+        self.logging: bool = False
+        self.message: str = ''
+        self.listener: keyboard.Listener = keyboard.Listener(on_press=self.key_pressed)
+        self.listener.start()
+
+        self.settings_file: ConfigParser = ConfigParser()
+        self.settings_file.read('Saves/settings.ini')
+
+        main_frame: CTk.CTkFrame = CTk.CTkFrame(master=self, fg_color='transparent')
+        main_frame.pack()
+
+        self.make_paths()
+
+        self.input_frame: CTk.CTkFrame = CTk.CTkFrame(
+            self,
+            width=325,
+            height=245,
+            fg_color="grey",
+            corner_radius=5,
+            border_width=1,
+        )
+        self.input_frame.place(x=410, y=35)
+
+        self.activate_button: CTk.CTkButton = CTk.CTkButton(
+            self.input_frame,
+            command=self.activate,
+            text="Activate",
+        )
+        self.activate_button.place(x=97, y=200)
+
+        save_button: CTk.CTkButton = CTk.CTkButton(
+            master=self.input_frame,
+            text='Save',
+            command=lambda: SaveApp(
+                True if self.account_app else False, 
+                (self.account_app.vars['Channel'].get(), self.account_app.vars['Account'].get()) if self.account_app else (self.webhook_app.vars['Webhook'].get()),
+                self
+            )
+        )
+        save_button.place(x=97, y=120)
+
+        self.info_display = CTk.CTkFrame(self, width=375, height=270, corner_radius=5)
+        self.info_display.place(x=15, y=15)
+
+        self.masters={'input frame':self.input_frame, 'info display':self.info_display}
+        self.account_app: AccountApp = AccountApp(self.masters)
+        self.webhook_app: WebhookApp = None#WebhookApp(masters)
+
+    def reset_saves(self) -> None:
         if self.account_app:
             self.account_app.set_saves()
         else:
             self.webhook_app.set_saves()
     
-    def key_pressed(self,key):
+    def key_pressed(self,key) -> None:
         if not self.activated: return
 
         settings_file = ConfigParser()
@@ -58,7 +114,7 @@ class MainApp(CTk.CTk):
         except Exception as e:
             print(type(e),e)
         
-    def activate(self):
+    def activate(self) -> None:
         self.settings_file.read('Saves/settings.ini')
         self.start_key = self.settings_file['activation']['start']
         self.stop_key = self.settings_file['activation']['stop']
@@ -70,20 +126,23 @@ class MainApp(CTk.CTk):
         
         self.activated = not self.activated
 
-    def send(self,message):
+    def send(self,message) -> None:
 
         self.logging = False
 
         try:
+            print(message)
             if self.settings_file['settings']['tts'] == 'true':
-                print(message)
+                
+                mixer.init(devicename='CABLE Input (VB-Audio Virtual Cable)')
                 tts = gTTS(message)
                 tts.save('Saves/tts.mp3')
 
                 mixer.music.load('Saves/tts.mp3')
                 mixer.music.play()
 
-                sleep(MP3('Saves/tts.mp3').info.length)
+                sound: MP3 =  MP3('Saves/tts.mp3')
+                sleep(sound.info.length)
 
                 mixer.music.unload()
                 remove('Saves/tts.mp3')
@@ -92,11 +151,11 @@ class MainApp(CTk.CTk):
                     payload = {'content': message}
                     header = {'authorization': self.account_app.vars['Account'].get()}
                     r = requests.post(self.account_app.vars['Channel'].get(), json=payload, headers=header)             
-                else:   
+                elif self.webhook_app:   
                     webhook = SyncWebhook.from_url(self.webhook_app.vars['Webhook'].get())
                     webhook.send(message, username=self.webhook_app.vars['Username'].get())
         except pygameerror as e:
-            print(e)
+            print(f'Pygame Mic: {e}')
         except PermissionError as e:
             print('Audio File being Used')
         except FileNotFoundError as e:
@@ -109,65 +168,7 @@ class MainApp(CTk.CTk):
         self.message = ''
         self.logging = False
 
-    def __init__(self):
-        super().__init__()
-
-        self.geometry('750x300')
-        self.resizable(False,False)
-        self.title('Key Log To Discord')
-
-        self.activated = False
-        self.logging = False
-        self.message = ''
-        self.listener = keyboard.Listener(on_press=self.key_pressed)
-        self.listener.start()
-
-        mixer.init(devicename='CABLE Input (VB-Audio Virtual Cable)')
-
-        self.settings_file = ConfigParser()
-        self.settings_file.read('Saves/settings.ini')
-
-        main_frame = CTk.CTkFrame(master=self, fg_color='transparent')
-        main_frame.pack()
-
-        self.make_paths()
-
-        self.input_frame = CTk.CTkFrame(
-            self,
-            width=325,
-            height=245,
-            fg_color="grey",
-            corner_radius=5,
-            border_width=1,
-        )
-        self.input_frame.place(x=410, y=35)
-
-        self.activate_button = CTk.CTkButton(
-            self.input_frame,
-            command=self.activate,
-            text="Activate",
-        )
-        self.activate_button.place(x=97, y=200)
-
-        save_button = CTk.CTkButton(
-            master=self.input_frame,
-            text='Save',
-            command=lambda: SaveApp(
-                True if self.account_app else False, 
-                (self.account_app.vars['Channel'].get(), self.account_app.vars['Account'].get()) if self.account_app else (self.webhook_app.vars['Webhook'].get()),
-                self
-            )
-        )
-        save_button.place(x=97, y=120)
-
-        self.info_display = CTk.CTkFrame(self, width=375, height=270, corner_radius=5)
-        self.info_display.place(x=15, y=15)
-
-        self.masters={'input frame':self.input_frame, 'info display':self.info_display}
-        self.account_app = AccountApp(self.masters)
-        self.webhook_app = None#WebhookApp(masters)
-
-    def make_paths(self):
+    def make_paths(self) -> None:
 
         def change_apps():
             for child in self.input_frame.winfo_children() + self.info_display.winfo_children():
@@ -187,7 +188,7 @@ class MainApp(CTk.CTk):
             self.activated = False
             self.logging = False
             self.message = ''
-        path_frame = CTk.CTkFrame(
+        path_frame: CTk.CTkFrame = CTk.CTkFrame(
             self, 
             width=325, 
             height=20, 
@@ -196,7 +197,7 @@ class MainApp(CTk.CTk):
             )
         path_frame.place(x=410, y=15)
 
-        self.changeapp_button = CTk.CTkButton(
+        self.changeapp_button: CTk.CTkButton = CTk.CTkButton(
             path_frame,
             height=20,
             width=325 / 2,
@@ -205,7 +206,7 @@ class MainApp(CTk.CTk):
         )
         self.changeapp_button.pack(side="left")
 
-        setting_button = CTk.CTkButton(
+        setting_button: CTk.CTkButton = CTk.CTkButton(
             path_frame,
             height=20,
             width=325 / 2,
@@ -215,6 +216,6 @@ class MainApp(CTk.CTk):
         setting_button.pack(side="left")
 
 if __name__ == '__main__':
-    App = MainApp()
+    App: MainApp = MainApp()
 
     App.mainloop()
