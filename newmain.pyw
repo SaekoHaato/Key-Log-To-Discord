@@ -1,4 +1,5 @@
 import customtkinter as CTk
+from tkinter import messagebox
 
 from NewModules.newaccount import AccountApp
 from NewModules.newwebhook import WebhookApp
@@ -160,7 +161,8 @@ class MainApp(CTk.CTk):
                 webhook = SyncWebhook.from_url(self.webhook_app.vars['Webhook'].get())
                 webhook.send(message, username=self.webhook_app.vars['Username'].get())
         except pygameerror as e:
-            print(f'Pygame Mic: {e}')
+            print(f"Pygame: Mic Doesn't Exist")
+            messagebox.showerror(message='TTS: Cannot Find Mic: CABLE Input (VB-Audio Virtual Cable)', title='Error')
         except PermissionError as e:
             print('Audio File being Used')
         except FileNotFoundError as e:
