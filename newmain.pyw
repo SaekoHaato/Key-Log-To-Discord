@@ -77,8 +77,7 @@ class MainApp(CTk.CTk):
         self.webhook_app: WebhookApp = None#WebhookApp(masters)
 
     def reset_saves(self) -> None:
-        """
-        Regenerates the saves
+        """Regenerates the saves
         """
         if self.account_app:
             self.account_app.set_saves()
@@ -86,10 +85,12 @@ class MainApp(CTk.CTk):
             self.webhook_app.set_saves()
     
     def key_pressed(self,key) -> None:
+        """Key logs and add it to message
+        """
 
         if not self.activated: return
 
-        settings_file = ConfigParser()
+        settings_file: ConfigParser = ConfigParser()
         settings_file.read('Saves/settings.ini')
         hotkeys = dict(zip(settings_file['quick send'].values(), settings_file['quick send'].keys()))
 
