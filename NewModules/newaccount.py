@@ -3,13 +3,21 @@ from NewModules.newcommon import create_input, scroll_display, set_replacerbutto
 
 class AccountApp():
 
-    def lock(self,entry) -> None:
+    def lock(self, entry: CTk.CTkEntry) -> None:
+        """Changes Entry to be typeable or locked
+
+        Args:
+            entry (CTk.CTkEntry): Which Entry to lock
+        """
         if entry.cget("state") == "disabled":
             entry.configure(state="normal")
         else:
             entry.configure(state="disabled")
 
     def set_saves(self) -> None:
+        """Recreates the saves into the Saves Area Widget
+        """
+
         for child in self.account_scroll.winfo_children() + self.channel_scroll.winfo_children():
             child.destroy()
 
